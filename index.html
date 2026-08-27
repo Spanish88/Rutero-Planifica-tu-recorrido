@@ -116,7 +116,7 @@
   .spacer{flex:1;}
 
   /* Pantalla inicio */
-  #view-inicio{ justify-content:center; align-items:center; text-align:center; position:relative;}
+  #view-inicio{ justify-content:flex-start; align-items:center; text-align:center; position:relative; overflow-y:auto; padding-bottom:360px;}
   .trail-mark{
     width:64px; height:64px; border-radius:50%;
     background:var(--signal-soft); display:flex; align-items:center; justify-content:center;
@@ -132,8 +132,9 @@
     background:var(--ink-800); color:var(--paper); font-size:16px;
     display:flex; align-items:center; justify-content:center; cursor:pointer;
   }
+  .global-theme-toggle{ z-index:120; position:fixed; right:max(18px, calc((100vw - 520px)/2 + 18px)); }
   .resume-banner{
-    position:absolute; bottom:calc(28px + var(--safe-bottom)); left:22px; right:22px;
+    position:fixed; bottom:calc(28px + var(--safe-bottom)); left:50%; right:auto; width:calc(100% - 44px); max-width:476px; transform:translateX(-50%); z-index:50;
     background:var(--ink-800); border:1px solid var(--line); border-radius:var(--radius-sm);
     padding:14px 16px; text-align:left; display:flex; align-items:center; gap:12px;
     cursor:pointer;
@@ -300,7 +301,6 @@
 
   <!-- 1. INICIO -->
   <section class="view active" id="view-inicio">
-    <button class="theme-toggle" id="btnTema" title="Cambiar tema">☀︎</button>
     <div class="trail-mark"></div>
     <p class="eyebrow">Rutero</p>
     <h1 class="display" style="font-size:30px;">Planifica tu recorrido</h1>
@@ -467,6 +467,7 @@
 
 </div>
 
+<button class="theme-toggle global-theme-toggle" id="btnTema" title="Cambiar tema">☀︎</button>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1012,7 +1013,7 @@ function renderHistorial(){
    (evita bloqueos del share nativo / portapapeles en algunos
    navegadores, p. ej. Chrome de Google en ciertos contextos)
 ========================================================= */
-function mostrarEnlace(url, inputId, boxId){
+function mostrarEnlace(url, inputId, boxId, duracion=15000){
   const input = document.getElementById(inputId);
   const box = document.getElementById(boxId);
   input.value = url;
@@ -1024,7 +1025,7 @@ function mostrarEnlace(url, inputId, boxId){
   mostrarEnlace._timers[boxId] = setTimeout(()=>{
     box.style.display = 'none';
     input.value = '';
-  }, 15000);
+  }, duracion);
 }
 
 function copiarEnlace(inputId){
@@ -1064,7 +1065,7 @@ function compartirRutaActual(){
   }
   const codificado = codificarRuta(state.origen, state.lugares);
   const url = `${location.origin}${location.pathname}?ruta=${codificado}`;
-  mostrarEnlace(url, 'linkRutaInput', 'linkRutaBox');
+  mostrarEnlace(url, 'linkRutaInput', 'linkRutaBox', 10000);
 }
 // Se mantiene el nombre anterior por compatibilidad con el botón del historial
 function compartirUltimaRuta(){ compartirRutaActual(); }
@@ -1073,7 +1074,7 @@ function compartirRutaDesdeNavegacion(){
     const r = state.rutaActual;
     const codificado = codificarRuta(r.origen, r.lugares);
     const url = `${location.origin}${location.pathname}?ruta=${codificado}`;
-    mostrarEnlace(url, 'linkNavInput', 'linkNavBox');
+    mostrarEnlace(url, 'linkNavInput', 'linkNavBox', 10000);
   } else {
     compartirRutaActual();
   }
